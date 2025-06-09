@@ -208,7 +208,7 @@ class ProductDetailPage extends StatelessWidget {
     );
 
     // Wait 10 seconds then launch Xibo
-    await Future.delayed(const Duration(seconds: 10));
+    await Future.delayed(const Duration(seconds: 1));
     if (context.mounted) {
       await _launchXiboClient();
     }
