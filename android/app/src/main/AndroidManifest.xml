@@ -40,13 +40,15 @@
         </activity>
 
         <!-- Thêm BroadcastReceiver vào đây -->
-       <receiver android:name=".MyReceiver">
-    <intent-filter>
-        <action android:name="com.example.MY_ACTION" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <data android:scheme="package" android:path="uk.org.xibo.client" />
-    </intent-filter>
-</receiver>
+        <receiver
+            android:name=".MyReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.OPEN_SALA_APP" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="package" android:path="uk.org.xibo.client" />
+            </intent-filter>
+        </receiver>
 
         <!-- Flutter plugin -->
         <meta-data
