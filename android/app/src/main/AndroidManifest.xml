@@ -63,6 +63,7 @@
             <intent-filter>
                 <action android:name="com.example.OPEN_SALA_APP" />
                 <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="package" android:path="uk.org.xibo.client" />
             </intent-filter>
         </receiver>
 
