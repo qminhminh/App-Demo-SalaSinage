@@ -2,17 +2,21 @@
     package="com.example.demo_app_salasignage">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
         android:label="SalaSignage"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
-        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
+            android:alwaysRetainTaskState="true"
+            android:clearTaskOnLaunch="true"
+            android:excludeFromRecents="true"
             android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -23,40 +27,50 @@
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
 
-            <!-- Mở app -->
+            <!-- Main launcher intent -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
-            <!-- Từ Xibo gọi -->
+            <!-- Deep Link handler -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="package" android:path="uk.org.xibo.client" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sala" />
             </intent-filter>
 
+            <!-- Custom URI for Xibo -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sala" android:host="open" />
+            </intent-filter>
 
+            <!-- Explicit intent for Xibo -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="package" android:path="com.example.demo_app_salasignage" />
+            </intent-filter>
         </activity>
 
-        <!-- Thêm BroadcastReceiver vào đây -->
         <receiver
             android:name=".MyReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.example.OPEN_SALA_APP" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="package" android:path="uk.org.xibo.client" />
             </intent-filter>
         </receiver>
 
-        <!-- Flutter plugin -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
 
-    <!-- Dùng để query Xibo package -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
