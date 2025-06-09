@@ -1,5 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,9 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-            builder: (context) =>
-                const MyHomePage(title: 'Flutter Demo Home Page')),
+        MaterialPageRoute(builder: (context) => const MyHomePage(title: '')),
       );
     });
   }
@@ -68,28 +69,28 @@ final List<Product> products = [
   Product(
     title: 'Lavie 500ml',
     description:
-        'Nước khoáng Lavie chai 500ml, tinh khiết, tiện lợi cho mọi hoạt động.',
+        'Lavie mineral water 500ml bottle, pure and convenient for all activities.',
     image: 'assets/images/shopping.png',
   ),
   Product(
     title: 'Lavie 1.5L',
     description:
-        'Nước khoáng Lavie chai 1.5L, phù hợp cho gia đình và văn phòng.',
+        'Lavie mineral water 1.5L bottle, perfect for family and office use.',
     image: 'assets/images/shopping.png',
   ),
   Product(
     title: 'Lavie 350ml',
-    description: 'Nước khoáng Lavie chai 350ml, nhỏ gọn, dễ mang theo.',
+    description: 'Lavie mineral water 350ml bottle, compact and easy to carry.',
     image: 'assets/images/shopping.png',
   ),
   Product(
     title: 'Lavie 5L',
-    description: 'Nước khoáng Lavie bình 5L, tiết kiệm cho nhu cầu lớn.',
+    description: 'Lavie mineral water 5L bottle, economical for large needs.',
     image: 'assets/images/shopping.png',
   ),
   Product(
     title: 'Lavie 19L',
-    description: 'Nước khoáng Lavie bình 19L, dùng cho máy lọc nước.',
+    description: 'Lavie mineral water 19L bottle, designed for water dispensers.',
     image: 'assets/images/shopping.png',
   ),
 ];
@@ -181,14 +182,35 @@ class ProductDetailPage extends StatelessWidget {
   final Product product;
   const ProductDetailPage({super.key, required this.product});
 
-  Future<void> _openShopeeApp(BuildContext context) async {
-    final uri = Uri.parse('https://shopee.vn/');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri,  mode: LaunchMode.externalApplication,);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không tìm thấy ứng dụng Shopee!')),
-      );
+  Future<void> _launchXiboClient() async {
+    const packageName = 'uk.org.xibo.client';
+
+    final intent = AndroidIntent(
+      action: 'android.intent.action.MAIN',
+      package: packageName,
+    );
+
+    try {
+      await intent.launch();
+    } on PlatformException {
+      debugPrint('Could not launch application $packageName');
+    }
+  }
+
+  void _handleOrder(BuildContext context) async {
+    // Show success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Order successful!'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 10),
+      ),
+    );
+
+    // Wait 10 seconds then launch Xibo
+    await Future.delayed(const Duration(seconds: 10));
+    if (context.mounted) {
+      await _launchXiboClient();
     }
   }
 
@@ -205,13 +227,14 @@ class ProductDetailPage extends StatelessWidget {
           children: [
             Center(child: Image.asset(product.image, width: 120, height: 120)),
             const SizedBox(height: 24),
-            Text(product.title, style: Theme.of(context).textTheme.headlineSmall),
+            Text(product.title,
+                style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 12),
             Text(product.description),
             const Spacer(),
             Center(
               child: ElevatedButton(
-                onPressed: () => _openShopeeApp(context),
+                onPressed: () => _handleOrder(context),
                 child: const Text('Add to cart'),
               ),
             ),
